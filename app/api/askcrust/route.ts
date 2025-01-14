@@ -3,10 +3,7 @@
 import { queryPineconeVectorStore } from "@/utils";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText, Message, StreamData, streamText } from "ai";
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 120;
+import { Message, StreamData, streamText } from "ai";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY ?? "",
@@ -23,15 +20,12 @@ const model = google("models/gemini-1.5-pro-latest", {
   ],
 });
 
-// This is the correct way to define the route handler
 export async function POST(req: Request) {
   const reqBody = await req.json();
-  console.log(reqBody);
-
   const messages: Message[] = reqBody.messages;
   const userQuestion = `${messages[messages.length - 1].content}`;
-
   const reportData: string = reqBody.data.reportData;
+
   const query = `Represent this for searching relevant passages: 
     Here is an API documentation excerpt: \n${reportData}.
     User's technical question: \n${userQuestion}`;
@@ -63,12 +57,10 @@ export async function POST(req: Request) {
       \n\n**Answer:**`;
 
     const data = new StreamData();
-    data.append({
-      retrievals: retrievals,
-    });
+    data.append({ retrievals });
 
     const result = await streamText({
-      model: model,
+      model,
       prompt: finalPrompt,
       onFinish() {
         data.close();
