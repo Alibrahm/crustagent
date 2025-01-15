@@ -10,11 +10,11 @@ const pinecone = new Pinecone({
 });
 
 const google = createGoogleGenerativeAI({
-  baseURL: "https://generativelanguage.googleapis.com/v1beta",
+  baseURL: "https://generativelanguage.googleapis.com/v1",
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-const model = google("models/gemini-1.5-pro-latest", {
+const model = google("models/gemini-1.5-flash", {
   safetySettings: [
     { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
   ],
